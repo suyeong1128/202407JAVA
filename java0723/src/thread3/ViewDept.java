@@ -1,5 +1,4 @@
-
-package swingJdbc;
+package thread3;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -11,10 +10,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Scanner;
+import java.time.LocalTime;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -27,6 +27,8 @@ public class ViewDept extends JFrame {
 	Connection conn;
 	Statement stmt;
 	JFrame jf;
+	WinTime winTime = new WinTime();
+	Thread thread = new Thread(winTime);
 	ViewDept() {
 		jf = this;
 		String URL = "jdbc:mysql://localhost:3307/spring5fs";	
@@ -51,7 +53,11 @@ public class ViewDept extends JFrame {
 		jp2.add(ta);
 		con.add(jp2, BorderLayout.CENTER);
 		
-		this.setTitle("view dept 테이블");
+		
+		thread.start();
+		con.add(winTime, BorderLayout.SOUTH);
+		
+		this.setTitle("");
 		this.setBounds(1200, 200, 500, 300);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -94,6 +100,27 @@ public class ViewDept extends JFrame {
 	
 	public static void main(String[] ar) {
 		new ViewDept();
+	}
+
+	class WinTime extends JPanel implements Runnable {
+		JLabel lb1;
+		WinTime() {
+			lb1 = new JLabel();
+			this.add(lb1);
+		}
+		public void run() {
+			for(;;) {
+				LocalTime localTime = LocalTime.now();
+				String str = String.format("%d : %d : %d\n", localTime.getHour(), localTime.getMinute(), localTime.getSecond());
+				lb1.setText(str);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

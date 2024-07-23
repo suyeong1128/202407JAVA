@@ -1,5 +1,5 @@
 
-package swingJdbc;
+package swing;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
@@ -51,7 +52,7 @@ public class ViewDept extends JFrame {
 		jp2.add(ta);
 		con.add(jp2, BorderLayout.CENTER);
 		
-		this.setTitle("view dept 테이블");
+		this.setTitle("select 문장을 넣으세요");
 		this.setBounds(1200, 200, 500, 300);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -63,27 +64,40 @@ public class ViewDept extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 //				String sql = "select deptno, dname, loc from dept";
 				String input = tf.getText();
-				String sql = String.format("select * from dept where loc like '%%%s%%'", input);
+//				String sql = String.format("select * from dept where loc like '%%%s%%'", input);
 				
 				try {
-					ResultSet rs = stmt.executeQuery(sql);
-					ta.setText("");
+					ResultSet rs = stmt.executeQuery(input);
 					
-					boolean flag = true;
-					while (rs.next()) {
-						flag = false;
-						int deptno = rs.getInt("deptno");
-						String dname = rs.getString("dname");
-						String loc = rs.getString("loc");
-						ta.append(String.format("%d %s %s\n", deptno, dname, loc));
-					}
-					if(flag) {
-						JOptionPane.showMessageDialog(jf, "해당 자료없습니다.", "정보", JOptionPane.WARNING_MESSAGE);
-					}
-					
+		            ResultSetMetaData rsmd = rs.getMetaData();
+		            int columnsNumber = rsmd.getColumnCount();
+		            ta.setText("");
+		            while (rs.next()) {
+		                for (int i = 1; i <= columnsNumber; i++) {
+		                    if (i > 1) ta.append(", ");
+		                    String columnValue = rs.getString(i);
+		                    ta.append(rsmd.getColumnName(i) + ": " + columnValue);
+		                }
+		                ta.append("\n");;
+		            }
+//					ResultSet rs = stmt.executeQuery(sql);
+//					ta.setText("");
+//					
+//					boolean flag = true;
+//					while (rs.next()) {
+//						flag = false;
+//						int deptno = rs.getInt("deptno");
+//						String dname = rs.getString("dname");
+//						String loc = rs.getString("loc");
+//						ta.append(String.format("%d %s %s\n", deptno, dname, loc));
+//					}
+//					if(flag) {
+//						JOptionPane.showMessageDialog(jf, "해당 자료없습니다.", "정보", JOptionPane.WARNING_MESSAGE);
+//					}
+//					
 				} catch (SQLException e2) {
 					// TODO Auto-generated catch block
-					e2.printStackTrace();
+					JOptionPane.showMessageDialog(jf, "해당 자료없습니다.", "정보", JOptionPane.WARNING_MESSAGE);
 				}
 
 				
